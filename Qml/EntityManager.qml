@@ -1,5 +1,6 @@
 import QtQuick
 import Game.Manager
+import Game
 Repeater {
 model : GameManager.entityManager
 delegate:
@@ -8,6 +9,6 @@ x : model.x
 y : model.y
 width: model.width
 height: model.height
-color : "black"
+color : model.EntityType === Enums.Obstacle?"red" : "black"
 }
 }
