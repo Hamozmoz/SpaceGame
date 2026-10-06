@@ -1,5 +1,6 @@
 #ifndef ENTITYMANAGER_H
 #define ENTITYMANAGER_H
+#include "CollisionGrid.h"
 #include "Entity.h"
 #include <QObject>
 #include <QAbstractListModel>
@@ -13,14 +14,22 @@ Height,
 x,
 y
 };
-
-uint m_EntityCount{0};
-std::array<Entity,2500> m_Entities;
+CollisionGrid m_CollisionGrid{10,10,80,80};
 public:
+std::array<Entity,EntityCount> m_Entities;
 int rowCount(const QModelIndex& parent = QModelIndex())const override;
 QVariant data(const QModelIndex& index , int role) const override;
 QHash<int,QByteArray> roleNames() const override;
+bool AddEntity(const Enums::EntityType& EntityType,uint16_t Health,const float x,const float y,const float width ,const float height,const float speed,const float xvelocity = 0,const float yvelocity = 0);
+void MoveEntities(const double deltaTime);
+int LastActiveIndex();
+void DeleteEntity(const uint IndextoDelete);
+void ResetCollisionGrid();
+const Entity& operator[](int index) const;
+Entity& operator[](int index);
 EntityManager();
+private:
+uint m_EntityCount{0};
 };
 
 #endif // ENTITYMANAGER_H
