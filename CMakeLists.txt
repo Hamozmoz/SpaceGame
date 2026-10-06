@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 project(Game VERSION 0.1 LANGUAGES CXX)
-
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick Multimedia)
@@ -15,17 +15,23 @@ endif()
 
 qt_add_executable(Game
     main.cpp
+    Entity.h Entity.cpp
+    CollisionGrid.h CollisionGrid.cpp
 )
 
 qt_add_qml_module(Game
     URI Game
     QML_FILES
     Qml/Main.qml
+    Qml/EntityManager.qml
+    Qml/InputHandler.qml
     SOURCES
     EntityManager.h EntityManager.cpp
-    Entity.h Entity.cpp
     GameManager.h GameManager.cpp
+    InputManager.h InputManager.cpp
+    Types.h
 )
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
