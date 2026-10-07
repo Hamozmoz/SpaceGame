@@ -13,7 +13,8 @@ Pressed
 enum EntityType : uint8_t{
 NoType,
 Player,
-Obstacle
+Obstacle,
+Projectile
 };
 enum Activity : uint8_t{
 Inactive,
