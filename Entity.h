@@ -26,18 +26,20 @@ float m_xVelocity;
 float m_yVelocity;
 float m_Speed;
 CollisionBox m_CollisionBox;
-uint16_t EntityIndex;
+uint16_t m_LastCollidedIndex;
 uint16_t m_Health;
-Enums::EntityType m_EntityType; //uint8_t
-Enums::Activity m_ColliderActive = Enums::Inactive; //uint8_t
-
+Enums::EntityType m_EntityType;
+Enums::Activity m_ColliderActive = Enums::Inactive;
+Enums::EntityId m_Entityid;
+uint8_t m_ProjPiercing ; // Technically Free Due To Padding
 Entity& operator=(const CollisionBox box);
 void SetValues(const Enums::EntityType EntityType = Enums::NoType,const uint16_t Health = 0, const float x = 0.0f, const float y = 0.0f,
-               const float width = 0.0f, const float height = 0.0f, const float speed = 0.0f, const float xvelocity =0.0f, const float yvelocity =0.0f);
+               const float width = 0.0f, const float height = 0.0f, const float speed = 0.0f, const float xvelocity =0.0f,
+               const float yvelocity =0.0f, const Enums::EntityId entityid = Enums::NoId,const uint8_t projectilepiercing = 0);
 Entity(const Enums::EntityType EntityType = Enums::NoType, const uint16_t Health = 0,const float x = 0.0f,
        const float y = 0.0f, const float width = 0.0f, const float height = 0.0f , Enums::Activity colliderActive = Enums::Inactive,
-       const float xvelocity = 0.0f, const float yvelocity = 0.0f, const float speed = 0.0f);
-void Damage(Entity& entityToDamage);
+       const float xvelocity = 0.0f,const float yvelocity = 0.0f, const float speed = 0.0f, const Enums::EntityId entityid = Enums::NoId,const uint8_t projectilepiercing = 0);
+void TakeDamage(uint16_t Damage);
 };
 
 #endif // ENTITY_H
