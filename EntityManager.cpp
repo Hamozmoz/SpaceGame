@@ -29,12 +29,12 @@ QHash<int, QByteArray> EntityManager::roleNames() const{
     return Roles;
 }
 
-bool EntityManager::AddEntity(const Enums::EntityType &EntityType, uint16_t Health, const float x, const float y, const float width, const float height, const float speed, const float xvelocity, const float yvelocity)
+bool EntityManager::AddEntity(const Enums::EntityType &EntityType, uint16_t Health, const float x, const float y, const float width, const float height, const float speed, const float xvelocity, const float yvelocity, const Enums::EntityId entityid, const uint8_t projectilepiercing)
 {
     if(m_EntityCount >= m_Entities.size()){
         return false;
     }
-    m_Entities[m_EntityCount].SetValues(EntityType,Health,x,y,width,height,speed,xvelocity,yvelocity);
+    m_Entities[m_EntityCount].SetValues(EntityType,Health,x,y,width,height,speed,xvelocity,yvelocity,entityid,projectilepiercing);
     ++m_EntityCount;
 
     return true;
@@ -42,6 +42,7 @@ bool EntityManager::AddEntity(const Enums::EntityType &EntityType, uint16_t Heal
 
 void EntityManager::MoveEntities(const double deltaTime)
 {
+
     for(int i{0}; i < m_EntityCount;++i)
     {
 if(m_Entities[i].m_xVelocity == 0 && m_Entities[i].m_yVelocity == 0){
@@ -49,16 +50,17 @@ continue;
 }
 QModelIndex curIndex = createIndex(i,0);
 float NextxMovement = m_Entities[i].m_x + m_Entities[i].m_xVelocity * deltaTime;
-float NextyPosition = m_Entities[i].m_y + m_Entities[i].m_yVelocity * deltaTime;;
+float NextyPosition = m_Entities[i].m_y + m_Entities[i].m_yVelocity * deltaTime;
 CollisionBox xProjectedBox(NextxMovement,m_Entities[i].m_y,m_Entities[i].m_Width,m_Entities[i].m_Height);
 bool CanMovex = true;
 bool CanMovey = true;
+bool ActionDone = false;
 std::vector<uint16_t> NearbyEntities = m_CollisionGrid.getNearbyEntities(xProjectedBox);
 for(auto entity : NearbyEntities){
 if(entity == i){
 continue;
 }
-if(xProjectedBox.OverLap(m_Entities[entity])){
+if(xProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone)){
 if(m_Entities[i].m_x < m_Entities[entity].m_x){
 m_Entities[i].m_x = m_Entities[entity].m_CollisionBox.m_LeftCorner - m_Entities[i].m_Width;
 }else{
@@ -74,7 +76,7 @@ for(auto entity : NearbyEntities){
 if(entity == i){
 continue;
 }
-if(yProjectedBox.OverLap(m_Entities[entity])){
+if(yProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone)){
 if(m_Entities[i].m_y <m_Entities[entity].m_y){
 m_Entities[i].m_y = m_Entities[entity].m_CollisionBox.m_TopCorner - m_Entities[i].m_Height;
 }else{
@@ -94,7 +96,7 @@ dataChanged(curIndex,curIndex,{x,y});
 }}
 
 
-int EntityManager::LastActiveIndex()
+inline int EntityManager::LastActiveIndex()
 {
     if(m_EntityCount > 0){
         return m_EntityCount -1;
@@ -105,7 +107,9 @@ int EntityManager::LastActiveIndex()
 void EntityManager::DeleteEntity(const uint IndextoDelete){
 
     m_Entities[IndextoDelete] = m_Entities[LastActiveIndex()];
+    beginRemoveRows(QModelIndex(),LastActiveIndex(),LastActiveIndex());
     --m_EntityCount;
+    endRemoveRows();
     QModelIndex changedIndex = createIndex(IndextoDelete,0);
     dataChanged(changedIndex,changedIndex);
 }
@@ -114,6 +118,38 @@ void EntityManager::ResetCollisionGrid()
 {
     m_CollisionGrid.CalculateEntityLocations(this->m_Entities,m_EntityCount);
 }
+
+bool EntityManager::CanMoveAfterCollisionAction(uint16_t collidingEntity, uint16_t otherEntity,bool& ActionDone){
+
+    if(m_Entities[collidingEntity].m_EntityType != Enums::Projectile){
+        return false;
+    }
+
+    if(!ActionDone && m_Entities[collidingEntity].m_LastCollidedIndex != otherEntity){
+    m_Entities[otherEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
+    ActionDone = true;
+    m_Entities[otherEntity].m_LastCollidedIndex = collidingEntity;
+    m_Entities[collidingEntity].m_LastCollidedIndex = otherEntity;
+    --m_Entities[collidingEntity].m_ProjPiercing;
+    }
+    if(m_Entities[collidingEntity].m_ProjPiercing == 0){
+        m_Entities[collidingEntity].m_Health = 0;
+        return false;
+    }
+
+    return true;
+}
+
+void EntityManager::DeleteDeadEntities()
+{
+    for(int i {0};i<m_EntityCount;++i){
+        if(m_Entities[i].m_Health == 0){
+            DeleteEntity(i);
+        }
+    }
+}
+
+
 Entity &EntityManager::operator[](int index)
 {
     return m_Entities[index];
@@ -126,7 +162,7 @@ const Entity &EntityManager::operator[](int index) const
 
 EntityManager::EntityManager()
 {
-for(int i {0}; i < m_Entities.size();++i){
-m_Entities[i].EntityIndex = i;
+for(int i {0};i<m_Entities.size();++i){
+m_Entities[i].m_LastCollidedIndex = i;
 }
 }
