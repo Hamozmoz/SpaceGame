@@ -24,8 +24,9 @@ FrameTimer->setInterval(16ms);
 FrameTimer->start();
 DeltaTimer->start();
 connect(FrameTimer,&QChronoTimer::timeout,this,&GameManager::Frame);
-m_EntityManager.AddEntity(Enums::Player,10,0,0,50,50,300);
-m_EntityManager.AddEntity(Enums::Obstacle,10,80,80,90,90,0);
+m_EntityManager.AddEntity(Enums::Player,10,1000,80,80,50,300);
+m_EntityManager.AddEntity(Enums::Obstacle,11,800,80,90,90,0);
+m_EntityManager.AddEntity(Enums::Projectile,10,0,80,30,30,10,90,0,Enums::NoId,2);
 }
 
 void GameManager::PlayerMovement()
@@ -45,6 +46,9 @@ void GameManager::Frame()
     m_EntityManager.ResetCollisionGrid();
     m_EntityManager.MoveEntities(DeltaTime);
     ++CurrentFrame;
+
+    m_EntityManager.DeleteDeadEntities();
+
     if(CurrentFrame > 60){
     CurrentFrame = 1;
     }
