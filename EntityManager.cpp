@@ -1,4 +1,5 @@
 #include "EntityManager.h"
+#include <iostream>
 
 int EntityManager::rowCount(const QModelIndex &parent) const
 {
@@ -60,7 +61,10 @@ for(auto entity : NearbyEntities){
 if(entity == i){
 continue;
 }
-if(xProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone)){
+if(entity == 2 && xProjectedBox.OverLap(m_Entities[entity])){
+std::cout<< "hel";
+}
+if(xProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone) && CanMovex){
 if(m_Entities[i].m_x < m_Entities[entity].m_x){
 m_Entities[i].m_x = m_Entities[entity].m_CollisionBox.m_LeftCorner - m_Entities[i].m_Width;
 }else{
@@ -76,7 +80,7 @@ for(auto entity : NearbyEntities){
 if(entity == i){
 continue;
 }
-if(yProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone)){
+if(yProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone) && CanMovey){
 if(m_Entities[i].m_y <m_Entities[entity].m_y){
 m_Entities[i].m_y = m_Entities[entity].m_CollisionBox.m_TopCorner - m_Entities[i].m_Height;
 }else{
