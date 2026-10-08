@@ -129,11 +129,11 @@ bool EntityManager::CanMoveAfterCollisionAction(uint16_t collidingEntity, uint16
         return false;
     }
 
-    if(!ActionDone && m_Entities[collidingEntity].m_LastCollidedIndex != otherEntity){
+    if(!ActionDone && m_Entities[collidingEntity].m_LastCollidedIndex != m_Entities[otherEntity].m_UniqueIndex){
     m_Entities[otherEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
     ActionDone = true;
-    m_Entities[otherEntity].m_LastCollidedIndex = collidingEntity;
-    m_Entities[collidingEntity].m_LastCollidedIndex = otherEntity;
+    m_Entities[otherEntity].m_LastCollidedIndex = m_Entities[collidingEntity].m_UniqueIndex;
+    m_Entities[collidingEntity].m_LastCollidedIndex = m_Entities[otherEntity].m_UniqueIndex;
     --m_Entities[collidingEntity].m_ProjPiercing;
     }
     if(m_Entities[collidingEntity].m_ProjPiercing == 0){
@@ -146,7 +146,7 @@ bool EntityManager::CanMoveAfterCollisionAction(uint16_t collidingEntity, uint16
 
 void EntityManager::DeleteDeadEntities()
 {
-    for(int i {0};i<m_EntityCount;++i){
+    for(int i {1};i<m_EntityCount;++i){
         if(m_Entities[i].m_Health == 0){
             DeleteEntity(i);
         }
@@ -168,5 +168,6 @@ EntityManager::EntityManager()
 {
 for(int i {0};i<m_Entities.size();++i){
 m_Entities[i].m_LastCollidedIndex = i;
+m_Entities[i].m_UniqueIndex = i;
 }
 }

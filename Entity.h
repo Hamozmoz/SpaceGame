@@ -25,13 +25,14 @@ float m_y;
 float m_xVelocity;
 float m_yVelocity;
 float m_Speed;
+uint32_t m_Health;
 CollisionBox m_CollisionBox;
 uint16_t m_LastCollidedIndex;
-uint16_t m_Health;
+uint16_t m_UniqueIndex;
 Enums::EntityType m_EntityType;
 Enums::Activity m_ColliderActive = Enums::Inactive;
 Enums::EntityId m_Entityid;
-uint8_t m_ProjPiercing ; // Technically Free Due To Padding
+uint8_t m_ProjPiercing;
 Entity& operator=(const CollisionBox box);
 void SetValues(const Enums::EntityType EntityType = Enums::NoType,const uint16_t Health = 0, const float x = 0.0f, const float y = 0.0f,
                const float width = 0.0f, const float height = 0.0f, const float speed = 0.0f, const float xvelocity =0.0f,
