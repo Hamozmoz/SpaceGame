@@ -1,5 +1,4 @@
 #include "EntityManager.h"
-#include <iostream>
 
 int EntityManager::rowCount(const QModelIndex &parent) const
 {
@@ -16,7 +15,7 @@ if(role == roles::Width){return m_Entities[index.row()].m_Width;}
 if(role == roles::Height){return m_Entities[index.row()].m_Height;}
 if(role == roles::x){return m_Entities[index.row()].m_x;}
 if(role == roles::y){return m_Entities[index.row()].m_y;}
-
+if(role == roles::color){return m_Entities[index.row()].Color();}
     return QVariant();
 }
 
@@ -27,10 +26,11 @@ QHash<int, QByteArray> EntityManager::roleNames() const{
     Roles[roles::Width] = "width";
     Roles[roles::x] = "x";
     Roles[roles::y] = "y";
+    Roles[roles::color] = "color";
     return Roles;
 }
 
-bool EntityManager::AddEntity(const Enums::EntityType &EntityType, uint16_t Health, const float x, const float y, const float width, const float height, const float speed, const float xvelocity, const float yvelocity, const Enums::EntityId entityid, const uint8_t projectilepiercing)
+bool EntityManager::AddEntityToArray(const Enums::EntityType &EntityType, uint16_t Health, const float x, const float y, const float width, const float height, const float speed, const float xvelocity, const float yvelocity, const Enums::EntityId entityid, const uint8_t projectilepiercing)
 {
     if(m_EntityCount >= m_Entities.size()){
         return false;
@@ -60,9 +60,6 @@ std::vector<uint16_t> NearbyEntities = m_CollisionGrid.getNearbyEntities(xProjec
 for(auto entity : NearbyEntities){
 if(entity == i){
 continue;
-}
-if(entity == 2 && xProjectedBox.OverLap(m_Entities[entity])){
-std::cout<< "hel";
 }
 if(xProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone) && CanMovex){
 if(m_Entities[i].m_x < m_Entities[entity].m_x){
@@ -124,17 +121,42 @@ void EntityManager::ResetCollisionGrid()
 }
 
 bool EntityManager::CanMoveAfterCollisionAction(uint16_t collidingEntity, uint16_t otherEntity,bool& ActionDone){
+bool NonProjectileCollision =
+(m_Entities[collidingEntity].m_EntityType != Enums::EntityType::EnemyProjectile &&
+ m_Entities[collidingEntity].m_EntityType != Enums::EntityType::PlayerProjectile&&
+ m_Entities[otherEntity].m_EntityType != Enums::EntityType::EnemyProjectile &&
+ m_Entities[otherEntity].m_EntityType != Enums::EntityType::PlayerProjectile);
+if(NonProjectileCollision)
+{
+return false;
+}
+bool HittingFriendly =
+((m_Entities[collidingEntity].m_EntityType == Enums::EntityType::Player           &&
+  m_Entities[otherEntity].m_EntityType == Enums::EntityType::PlayerProjectile)    ||
+( m_Entities[collidingEntity].m_EntityType == Enums::EntityType::PlayerProjectile &&
+  m_Entities[otherEntity].m_EntityType == Enums::EntityType::Player)              ||
+ (m_Entities[collidingEntity].m_EntityType == Enums::EntityType::Enemy            &&
+  m_Entities[otherEntity].m_EntityType == Enums::EntityType::EnemyProjectile)     ||
+  m_Entities[collidingEntity].m_EntityType == Enums::EntityType::EnemyProjectile  &&
+  m_Entities[otherEntity].m_EntityType == Enums::EntityType::Enemy);
 
-    if(m_Entities[collidingEntity].m_EntityType != Enums::Projectile){
-        return false;
-    }
+if(HittingFriendly)
+{
+return true;
+}
 
     if(!ActionDone && m_Entities[collidingEntity].m_LastCollidedIndex != m_Entities[otherEntity].m_UniqueIndex){
-    m_Entities[otherEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
     ActionDone = true;
     m_Entities[otherEntity].m_LastCollidedIndex = m_Entities[collidingEntity].m_UniqueIndex;
     m_Entities[collidingEntity].m_LastCollidedIndex = m_Entities[otherEntity].m_UniqueIndex;
+    if((m_Entities[collidingEntity].m_EntityType == Enums::EntityType::PlayerProjectile &&
+        m_Entities[otherEntity].m_EntityType == Enums::EntityType::Player) || (m_Entities[collidingEntity].m_EntityType
+        == Enums::EnemyProjectile && m_Entities[otherEntity].m_EntityType == Enums::EntityType::EnemyProjectile))
+        {
+        return true;
+        }
     --m_Entities[collidingEntity].m_ProjPiercing;
+    m_Entities[otherEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
     }
     if(m_Entities[collidingEntity].m_ProjPiercing == 0){
         m_Entities[collidingEntity].m_Health = 0;
@@ -171,3 +193,5 @@ m_Entities[i].m_LastCollidedIndex = i;
 m_Entities[i].m_UniqueIndex = i;
 }
 }
+
+
