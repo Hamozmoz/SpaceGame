@@ -28,7 +28,13 @@ PlayerId,
 SpaceRockId,
 SpaceBoltId
 };
+enum GameState : uint8_t{
+OpeningScreen,
+GameRunning,
+GamePaused,
 
+};
+Q_ENUM_NS(GameState)
 Q_ENUM_NS(EntityType)
 Q_ENUM_NS(ButtonState)
 }
