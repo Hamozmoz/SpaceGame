@@ -9,6 +9,6 @@ x : model.x
 y : model.y
 width: model.width
 height: model.height
-color : model.EntityType === Enums.Obstacle?"red" : "black"
+color : model.color
 }
 }
