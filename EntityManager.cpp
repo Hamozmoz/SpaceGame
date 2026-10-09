@@ -46,12 +46,11 @@ void EntityManager::MoveEntities(const double deltaTime)
 
     for(int i{0}; i < m_EntityCount;++i)
     {
-if(m_Entities[i].m_xVelocity == 0 && m_Entities[i].m_yVelocity == 0){
+if(m_Entities[i].m_EntityActive != Enums::Activity::Active||(m_Entities[i].m_xVelocity == 0 && m_Entities[i].m_yVelocity == 0)){
 continue;
 }
 QModelIndex curIndex = createIndex(i,0);
 float NextxMovement = m_Entities[i].m_x + m_Entities[i].m_xVelocity * deltaTime;
-float NextyPosition = m_Entities[i].m_y + m_Entities[i].m_yVelocity * deltaTime;
 CollisionBox xProjectedBox(NextxMovement,m_Entities[i].m_y,m_Entities[i].m_Width,m_Entities[i].m_Height);
 bool CanMovex = true;
 bool CanMovey = true;
@@ -70,7 +69,7 @@ m_Entities[i].m_x = m_Entities[entity].m_CollisionBox.m_RightCorner;
 CanMovex = false;
 }
 }
-NextyPosition = m_Entities[i].m_y + m_Entities[i].m_yVelocity * deltaTime;
+float NextyPosition = m_Entities[i].m_y + m_Entities[i].m_yVelocity * deltaTime;
 CollisionBox yProjectedBox(m_Entities[i].m_x,NextyPosition,m_Entities[i].m_Width,m_Entities[i].m_Height);
 NearbyEntities = m_CollisionGrid.getNearbyEntities(yProjectedBox);
 for(auto entity : NearbyEntities){
@@ -159,7 +158,7 @@ return true;
     m_Entities[otherEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
     }
     if(m_Entities[collidingEntity].m_ProjPiercing == 0){
-        m_Entities[collidingEntity].m_Health = 0;
+        m_Entities[collidingEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
         return false;
     }
 
@@ -171,6 +170,7 @@ void EntityManager::DeleteDeadEntities()
     for(int i {1};i<m_EntityCount;++i){
         if(m_Entities[i].m_Health == 0){
             DeleteEntity(i);
+            --i;
         }
     }
 }

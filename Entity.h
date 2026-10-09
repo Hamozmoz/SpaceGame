@@ -30,16 +30,16 @@ CollisionBox m_CollisionBox;
 uint16_t m_LastCollidedIndex;
 uint16_t m_UniqueIndex;
 Enums::EntityType m_EntityType;
-Enums::Activity m_ColliderActive = Enums::Inactive;
+Enums::Activity m_EntityActive = Enums::Active;
 Enums::EntityId m_Entityid;
 uint8_t m_ProjPiercing;
 Entity& operator=(const CollisionBox box);
-void SetValues(const Enums::EntityType EntityType = Enums::NoType,const uint16_t Health = 0, const float x = 0.0f, const float y = 0.0f,
+void SetValues(const Enums::EntityType EntityType = Enums::NoType, const uint16_t Health = 0, const float x = 0.0f, const float y = 0.0f,
                const float width = 0.0f, const float height = 0.0f, const float speed = 0.0f, const float xvelocity =0.0f,
-               const float yvelocity =0.0f, const Enums::EntityId entityid = Enums::NoId,const uint8_t projectilepiercing = 0);
-Entity(const Enums::EntityType EntityType = Enums::NoType, const uint16_t Health = 0,const float x = 0.0f,
-       const float y = 0.0f, const float width = 0.0f, const float height = 0.0f , Enums::Activity colliderActive = Enums::Inactive,
-       const float xvelocity = 0.0f,const float yvelocity = 0.0f, const float speed = 0.0f, const Enums::EntityId entityid = Enums::NoId,const uint8_t projectilepiercing = 0);
+               const float yvelocity =0.0f, const Enums::EntityId entityid = Enums::NoId, const uint8_t projectilepiercing = 0, const Enums::Activity entityActive = Enums::Activity::Active);
+Entity(const Enums::EntityType EntityType = Enums::NoType, const uint16_t Health = 0, const float x = 0.0f,
+       const float y = 0.0f, const float width = 0.0f, const float height = 0.0f , Enums::Activity EntityActive = Enums::Inactive,
+       const float xvelocity = 0.0f, const float yvelocity = 0.0f, const float speed = 0.0f, const Enums::EntityId entityid = Enums::NoId, const uint8_t projectilepiercing = 0);
 void TakeDamage(uint16_t Damage);
 QString Color() const;
 };

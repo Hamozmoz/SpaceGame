@@ -1,14 +1,15 @@
 #include "Entity.h"
-Entity::Entity(const Enums::EntityType EntityType, const uint16_t Health, const float x, const float y, const float width, const float height, Enums::Activity colliderActive, const float xvelocity, const float yvelocity, const float speed, const Enums::EntityId entityid,const uint8_t projectilepiercing) :
-    m_EntityType(EntityType),m_Health(Health),m_x(x),m_y(y),m_Width(width),m_Height(height),m_CollisionBox(x,y,width,height),m_xVelocity(xvelocity),m_ColliderActive(colliderActive),m_yVelocity(yvelocity),m_Entityid(entityid),m_ProjPiercing(projectilepiercing)
+Entity::Entity(const Enums::EntityType EntityType, const uint16_t Health, const float x, const float y, const float width, const float height, Enums::Activity EntityActive, const float xvelocity, const float yvelocity, const float speed, const Enums::EntityId entityid, const uint8_t projectilepiercing) :
+    m_EntityType(EntityType),m_Health(Health),m_x(x),m_y(y),m_Width(width),m_Height(height),m_CollisionBox(x,y,width,height),m_xVelocity(xvelocity),m_EntityActive(EntityActive),m_yVelocity(yvelocity),m_Entityid(entityid),m_ProjPiercing(projectilepiercing)
 {}
 
 void Entity::TakeDamage(uint16_t Damage)
 {
-    if(Damage > m_Health){
-        m_Health = 0;
+    if(Damage < m_Health){
+       m_Health -= Damage;
     }else {
-        m_Health -= Damage;
+       m_Health = 0;
+       m_EntityActive = Enums::Activity::Inactive;
     }
 }
 
@@ -48,7 +49,7 @@ Entity &Entity::operator=(const CollisionBox box){
     return *this;
 }
 
-void Entity::SetValues(const Enums::EntityType EntityType, const uint16_t Health , const float x, const float y, const float width, const float height, const float speed , const float xvelocity, const float yvelocity, const Enums::EntityId entityid, const uint8_t projectilepiercing){
+void Entity::SetValues(const Enums::EntityType EntityType, const uint16_t Health , const float x, const float y, const float width, const float height, const float speed , const float xvelocity, const float yvelocity, const Enums::EntityId entityid, const uint8_t projectilepiercing,const Enums::Activity entityActive ){
     m_EntityType = EntityType;
     m_Health = Health;
     m_x = x;
@@ -61,6 +62,7 @@ void Entity::SetValues(const Enums::EntityType EntityType, const uint16_t Health
     m_CollisionBox = CollisionBox(x,y,width,height);
     m_Entityid = entityid;
     m_ProjPiercing = projectilepiercing;
+    m_EntityActive = entityActive;
 }
 CollisionBox::CollisionBox(const float x, const float y, const float width, const float height) :
     m_LeftCorner(x),m_RightCorner(x + width),m_TopCorner(y),m_BottomCorner(y + height)

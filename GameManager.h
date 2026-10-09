@@ -15,6 +15,7 @@ EntityManager* readEntityManager();
 InputManager* readInputManager();
 private:
 uint CurrentFrame{1};
+uint64_t CurrentSecond{0};
 GameManager();
 EntityManager m_EntityManager;
 InputManager m_InputManager;

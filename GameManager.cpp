@@ -47,9 +47,10 @@ void GameManager::Frame()
     m_EntityManager.MoveEntities(DeltaTime);
     ++CurrentFrame;
 
-    m_EntityManager.DeleteDeadEntities();
 
     if(CurrentFrame > 60){
+    m_EntityManager.DeleteDeadEntities();
     CurrentFrame = 1;
+    ++CurrentSecond;
     }
 }
