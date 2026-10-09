@@ -12,6 +12,32 @@ void Entity::TakeDamage(uint16_t Damage)
     }
 }
 
+QString Entity::Color() const
+{
+    switch(m_EntityType){
+    case Enums::EntityType::Player:
+        return "black";
+        break;
+    case Enums::EntityType::PlayerProjectile:
+        return "green";
+        break;
+    case Enums::EntityType::Enemy:
+        return "red";
+        break;
+    case Enums::EntityType::EnemyProjectile:
+        return "darkred";
+        break;
+    case Enums::EntityType::Obstacle:
+        return "blue";
+        break;
+    default:
+        return "white";
+        break;
+    }
+
+
+}
+
 
 
 Entity &Entity::operator=(const CollisionBox box){

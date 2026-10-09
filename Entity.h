@@ -41,6 +41,7 @@ Entity(const Enums::EntityType EntityType = Enums::NoType, const uint16_t Health
        const float y = 0.0f, const float width = 0.0f, const float height = 0.0f , Enums::Activity colliderActive = Enums::Inactive,
        const float xvelocity = 0.0f,const float yvelocity = 0.0f, const float speed = 0.0f, const Enums::EntityId entityid = Enums::NoId,const uint8_t projectilepiercing = 0);
 void TakeDamage(uint16_t Damage);
+QString Color() const;
 };
 
 #endif // ENTITY_H
