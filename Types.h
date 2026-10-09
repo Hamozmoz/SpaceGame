@@ -13,8 +13,10 @@ Pressed
 enum EntityType : uint8_t{
 NoType,
 Player,
+Enemy,
 Obstacle,
-Projectile
+PlayerProjectile,
+EnemyProjectile
 };
 enum Activity : uint8_t{
 Inactive,
@@ -22,6 +24,9 @@ Active
 };
 enum EntityId : uint8_t{
 NoId,
+PlayerId,
+SpaceRockId,
+SpaceBoltId
 };
 
 Q_ENUM_NS(EntityType)
