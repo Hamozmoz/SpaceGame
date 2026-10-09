@@ -24,9 +24,9 @@ FrameTimer->setInterval(16ms);
 FrameTimer->start();
 DeltaTimer->start();
 connect(FrameTimer,&QChronoTimer::timeout,this,&GameManager::Frame);
-m_EntityManager.AddEntity(Enums::Player,10,1000,80,80,50,300);
-m_EntityManager.AddEntity(Enums::Obstacle,11,800,80,90,90,0);
-m_EntityManager.AddEntity(Enums::Projectile,10,0,80,30,30,10,90,0,Enums::NoId,2);
+m_EntityManager.AddEntity<Enums::PlayerId>();
+m_EntityManager.AddEntity<Enums::SpaceRockId>(800,80);
+m_EntityManager.AddEntity<Enums::SpaceBoltId>(0,80);
 }
 
 void GameManager::PlayerMovement()
