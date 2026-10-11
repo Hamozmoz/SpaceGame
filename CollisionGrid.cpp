@@ -22,8 +22,16 @@ ClearBoxes();
   uint8_t LastRow = static_cast<uint8_t>(EntityArray[i].m_CollisionBox.m_BottomCorner/m_BoxHeight);
   uint8_t FirstColumn = static_cast<uint8_t>(EntityArray[i].m_CollisionBox.m_LeftCorner/m_BoxWidth);
   uint8_t LastColumn = static_cast<uint8_t>(EntityArray[i].m_CollisionBox.m_RightCorner/m_BoxWidth);
- if(FirstRow > m_Rows || LastRow > m_Rows || FirstColumn > m_Columns || LastColumn > m_Columns){
+ if(FirstRow > m_Rows  || FirstColumn > m_Columns ){
  continue;
+ }
+ if(LastRow > m_Rows)
+ {
+ LastRow = m_Rows;
+ }
+ if(LastColumn > m_Columns)
+ {
+ LastColumn = m_Columns;
  }
         for(int row{FirstRow}; row<=LastRow;++row){
             for(int column{FirstColumn};column<=LastColumn;++column){
