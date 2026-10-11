@@ -11,8 +11,11 @@ Q_PROPERTY(EntityManager* entityManager READ readEntityManager CONSTANT)
 Q_PROPERTY(InputManager* inputManager READ readInputManager CONSTANT)
 public:
 static GameManager& Instance();
-EntityManager* readEntityManager();
+EntityManager *readEntityManager();
 InputManager* readInputManager();
+inline const uint CurFrame() const;
+inline const uint64_t CurSecond() const;
+inline const float DTime() const;
 private:
 uint CurrentFrame{1};
 uint64_t CurrentSecond{0};

@@ -6,14 +6,15 @@ GameManager &GameManager::Instance()
 }
 
 EntityManager* GameManager::readEntityManager()
-{
-    return &m_EntityManager;
-}
-
+{return &m_EntityManager;}
 InputManager *GameManager::readInputManager()
-{
-    return &m_InputManager;
-}
+{return &m_InputManager;}
+const uint GameManager::CurFrame() const
+{return CurrentFrame;}
+const uint64_t GameManager::CurSecond() const
+{return CurrentSecond;}
+const float GameManager::DTime() const
+{return DeltaTime;}
 
 GameManager::GameManager()
 {
