@@ -32,20 +32,22 @@ void InputManager::WriteLeftPressed(Enums::ButtonState val){
     }
 }
 
+void InputManager::WriteXPressed(Enums::ButtonState val)
+{
+    if(val != XPressed)
+    {
+        XPressed = val;
+        XPressedChanged();
+    }
+}
+
 Enums::ButtonState InputManager::ReadUpPressed()
-{
-    return UpPressed;
-}
-
-Enums::ButtonState InputManager::ReadDownPressed(){
-    return DownPressed;
-}
-
+{return UpPressed;}
+Enums::ButtonState InputManager::ReadDownPressed()
+{return DownPressed;}
 Enums::ButtonState InputManager::ReadRightPressed()
-{
-    return RightPressed;
-}
-
-Enums::ButtonState InputManager::ReadLeftPressed(){
-    return LeftPressed;
-}
+{return RightPressed;}
+Enums::ButtonState InputManager::ReadLeftPressed()
+{return LeftPressed;}
+Enums::ButtonState InputManager::ReadXPressed()
+{return XPressed;}
