@@ -11,7 +11,7 @@ CollisionBox& getCollisionBox(int row,int column);
 void CalculateEntityLocations(const std::array<Entity,EntityCount>& EntityArray, int ArraySize);
 const std::vector<uint16_t>& getNearbyEntities(const CollisionBox& box);
 private:
-void ClearBoxes();
+inline void ClearBoxes();
 std::vector<std::vector<uint16_t>> m_Boxes;
 std::vector<uint16_t>m_NearbyEntitiesBuffer;
 float m_BoxWidth{0};

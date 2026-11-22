@@ -49,9 +49,17 @@ const std::vector<uint16_t> &CollisionGrid::getNearbyEntities(const CollisionBox
     uint8_t LastRow = static_cast<uint8_t>(box.m_BottomCorner/m_BoxHeight);
     uint8_t FirstColumn = static_cast<uint8_t>(box.m_LeftCorner/m_BoxWidth);
     uint8_t LastColumn = static_cast<uint8_t>(box.m_RightCorner/m_BoxWidth);
-    if(FirstRow > m_Rows || LastRow > m_Rows || FirstColumn > m_Columns || LastColumn > m_Columns)
+    if(FirstColumn > m_Columns || LastColumn > m_Columns)
     {
     return m_NearbyEntitiesBuffer;
+    }
+    if(LastRow > m_Rows)
+    {
+     LastRow = m_Rows;
+    }
+    if(LastColumn > m_Columns)
+    {
+     LastColumn = m_Columns;
     }
     for(int row{FirstRow}; row<=LastRow;++row){
         for(int column{FirstColumn};column<=LastColumn;++column){
