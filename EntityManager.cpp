@@ -36,7 +36,21 @@ bool EntityManager::AddEntityToArray(const Enums::EntityType &EntityType, uint16
         return false;
     }
     m_Entities[m_EntityCount].SetValues(EntityType,Health,x,y,width,height,speed,xvelocity,yvelocity,entityid,projectilepiercing);
+    beginInsertRows(QModelIndex(),m_EntityCount,m_EntityCount);
     ++m_EntityCount;
+    endInsertRows();
+
+    return true;
+}
+
+bool EntityManager::AddEntityToArray(Entity Entity){
+    if(m_EntityCount >= m_Entities.size()){
+        return false;
+    }
+    m_Entities[m_EntityCount].SetValues(Entity);
+    beginInsertRows(QModelIndex(),m_EntityCount,m_EntityCount);
+    ++m_EntityCount;
+    endInsertRows();
 
     return true;
 }
@@ -55,12 +69,13 @@ CollisionBox xProjectedBox(NextxMovement,m_Entities[i].m_y,m_Entities[i].m_Width
 bool CanMovex = true;
 bool CanMovey = true;
 bool ActionDone = false;
+
 std::vector<uint16_t> NearbyEntities = m_CollisionGrid.getNearbyEntities(xProjectedBox);
 for(auto entity : NearbyEntities){
 if(entity == i){
 continue;
 }
-if(xProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone) && CanMovex){
+if(xProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone)){
 if(m_Entities[i].m_x < m_Entities[entity].m_x){
 m_Entities[i].m_x = m_Entities[entity].m_CollisionBox.m_LeftCorner - m_Entities[i].m_Width;
 }else{
@@ -76,13 +91,17 @@ for(auto entity : NearbyEntities){
 if(entity == i){
 continue;
 }
-if(yProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone) && CanMovey){
+if(yProjectedBox.OverLap(m_Entities[entity]) && !CanMoveAfterCollisionAction(i,entity,ActionDone)){
 if(m_Entities[i].m_y <m_Entities[entity].m_y){
 m_Entities[i].m_y = m_Entities[entity].m_CollisionBox.m_TopCorner - m_Entities[i].m_Height;
 }else{
 m_Entities[i].m_y = m_Entities[entity].m_CollisionBox.m_BottomCorner;
 }
 CanMovey = false;
+}
+if(m_Entities[i].m_EntityActive == Enums::Inactive)
+{
+break;
 }
 }
 if(CanMovex){
@@ -93,7 +112,10 @@ m_Entities[i].m_y = NextyPosition;
 }
 m_Entities[i].m_CollisionBox = CollisionBox{m_Entities[i]};
 dataChanged(curIndex,curIndex,{x,y});
-}}
+
+}
+DeleteDLEntities();
+}
 
 
 inline int EntityManager::LastActiveIndex()
@@ -120,47 +142,45 @@ void EntityManager::ResetCollisionGrid()
 }
 
 bool EntityManager::CanMoveAfterCollisionAction(uint16_t collidingEntity, uint16_t otherEntity,bool& ActionDone){
+
+bool CollidingEntityisNotProjectile =
+(m_Entities[collidingEntity].m_EntityType != Enums::EntityType::EnemyProjectile &&
+ m_Entities[collidingEntity].m_EntityType != Enums::EntityType::PlayerProjectile);
+
+if(CollidingEntityisNotProjectile)
+{std::swap(collidingEntity,otherEntity);}
+
 bool NonProjectileCollision =
 (m_Entities[collidingEntity].m_EntityType != Enums::EntityType::EnemyProjectile &&
- m_Entities[collidingEntity].m_EntityType != Enums::EntityType::PlayerProjectile&&
- m_Entities[otherEntity].m_EntityType != Enums::EntityType::EnemyProjectile &&
- m_Entities[otherEntity].m_EntityType != Enums::EntityType::PlayerProjectile);
+ m_Entities[collidingEntity].m_EntityType != Enums::EntityType::PlayerProjectile);
+
 if(NonProjectileCollision)
-{
-return false;
-}
+{return false;}
+
 bool HittingFriendly =
-((m_Entities[collidingEntity].m_EntityType == Enums::EntityType::Player           &&
-  m_Entities[otherEntity].m_EntityType == Enums::EntityType::PlayerProjectile)    ||
-( m_Entities[collidingEntity].m_EntityType == Enums::EntityType::PlayerProjectile &&
-  m_Entities[otherEntity].m_EntityType == Enums::EntityType::Player)              ||
- (m_Entities[collidingEntity].m_EntityType == Enums::EntityType::Enemy            &&
-  m_Entities[otherEntity].m_EntityType == Enums::EntityType::EnemyProjectile)     ||
-  m_Entities[collidingEntity].m_EntityType == Enums::EntityType::EnemyProjectile  &&
-  m_Entities[otherEntity].m_EntityType == Enums::EntityType::Enemy);
+       ((m_Entities[collidingEntity].m_EntityType == Enums::PlayerProjectile  &&
+         m_Entities[otherEntity].m_EntityType == Enums::Player              ) ||
+        (m_Entities[collidingEntity].m_EntityType == Enums::EnemyProjectile   &&
+         m_Entities[otherEntity].m_EntityType == Enums::Enemy)                ||
+         (m_Entities[collidingEntity].m_EntityType == Enums::EnemyProjectile  &&
+          m_Entities[otherEntity].m_EntityType == Enums::EnemyProjectile)     ||
+         (m_Entities[collidingEntity].m_EntityType == Enums::PlayerProjectile &&
+          m_Entities[otherEntity].m_EntityType == Enums::PlayerProjectile));
 
 if(HittingFriendly)
-{
-return true;
-}
-
-    if(!ActionDone && m_Entities[collidingEntity].m_LastCollidedIndex != m_Entities[otherEntity].m_UniqueIndex){
+{return true;}
+    if(!ActionDone && m_Entities[collidingEntity].m_LastCollidedIndex != m_Entities[otherEntity].m_UniqueIndex
+                   && m_Entities[collidingEntity].m_ProjPiercing > 0){
     ActionDone = true;
     m_Entities[otherEntity].m_LastCollidedIndex = m_Entities[collidingEntity].m_UniqueIndex;
     m_Entities[collidingEntity].m_LastCollidedIndex = m_Entities[otherEntity].m_UniqueIndex;
-    if((m_Entities[collidingEntity].m_EntityType == Enums::EntityType::PlayerProjectile &&
-        m_Entities[otherEntity].m_EntityType == Enums::EntityType::Player) || (m_Entities[collidingEntity].m_EntityType
-        == Enums::EnemyProjectile && m_Entities[otherEntity].m_EntityType == Enums::EntityType::EnemyProjectile))
-        {
-        return true;
-        }
     --m_Entities[collidingEntity].m_ProjPiercing;
     m_Entities[otherEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
-    }
     if(m_Entities[collidingEntity].m_ProjPiercing == 0){
-        m_Entities[collidingEntity].TakeDamage(m_Entities[collidingEntity].m_Health);
-        return false;
+    AddToDLBuffer(collidingEntity);
     }
+    }
+
 
     return true;
 }
@@ -174,6 +194,12 @@ void EntityManager::DeleteDeadEntities()
         }
     }
 }
+
+Entity &EntityManager::GetPlayer()
+{return m_Entities[0];}
+
+const Entity &EntityManager::GetPlayer() const
+{return m_Entities[0];}
 
 
 Entity &EntityManager::operator[](int index)
@@ -193,5 +219,21 @@ m_Entities[i].m_LastCollidedIndex = i;
 m_Entities[i].m_UniqueIndex = i;
 }
 }
+
+void EntityManager::DeleteDLEntities()
+{
+    for(auto i : m_DeleteLaterBuffer)
+    {
+        DeleteEntity(i);
+    }
+    m_DeleteLaterBuffer.clear();
+}
+
+void EntityManager::AddToDLBuffer(const uint16_t index)
+{
+    m_DeleteLaterBuffer.emplace_back(index);
+    m_Entities[index].m_EntityActive = Enums::Activity::Inactive;
+}
+
 
 
