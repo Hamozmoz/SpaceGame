@@ -42,7 +42,10 @@ GamePaused,
 };
 Q_ENUM_NS(GameState)
 Q_ENUM_NS(EntityType)
+Q_ENUM_NS(EntityId)
 Q_ENUM_NS(ButtonState)
+Q_ENUM_NS(Activity)
+Q_ENUM_NS(EntityState)
 }
 
 
