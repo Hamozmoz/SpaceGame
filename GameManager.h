@@ -15,6 +15,7 @@ EntityManager *readEntityManager();
 InputManager* readInputManager();
 inline const uint CurFrame() const;
 inline const uint64_t CurSecond() const;
+const uint64_t CurGlobalFrame() const;
 inline const float DTime() const;
 private:
 uint CurrentFrame{1};
@@ -26,6 +27,7 @@ QChronoTimer* FrameTimer;
 QElapsedTimer* DeltaTimer;
 double DeltaTime {0};
 void PlayerMovement();
+void PlayerAttack();
 void Frame();
 
 };

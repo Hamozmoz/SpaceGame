@@ -13,6 +13,8 @@ const uint GameManager::CurFrame() const
 {return CurrentFrame;}
 const uint64_t GameManager::CurSecond() const
 {return CurrentSecond;}
+const uint64_t GameManager::CurGlobalFrame() const
+{ return 60*CurrentSecond + CurrentFrame; }
 const float GameManager::DTime() const
 {return DeltaTime;}
 
@@ -22,12 +24,12 @@ FrameTimer = new QChronoTimer(this);
 DeltaTimer = new QElapsedTimer();
 using namespace std::chrono_literals;
 FrameTimer->setInterval(16ms);
+connect(FrameTimer,&QChronoTimer::timeout,this,&GameManager::Frame);
 FrameTimer->start();
 DeltaTimer->start();
-connect(FrameTimer,&QChronoTimer::timeout,this,&GameManager::Frame);
-m_EntityManager.AddEntity<Enums::PlayerId>();
+m_EntityManager.AddEntity<Enums::PlayerId>(750,600);
 m_EntityManager.AddEntity<Enums::SpaceRockId>(800,80);
-m_EntityManager.AddEntity<Enums::SpaceBoltId>(0,80);
+
 }
 
 void GameManager::PlayerMovement()
@@ -40,6 +42,14 @@ m_EntityManager[0].m_yVelocity = m_EntityManager[0].m_Speed * SpeedMultiplier;
     }
 }
 
+void GameManager::PlayerAttack()
+{
+    if(m_InputManager.XPressed == Enums::Pressed)
+    {
+        m_EntityManager.AddEntity<Enums::SpaceBoltId>(m_EntityManager.GetPlayer().m_x,m_EntityManager.GetPlayer().m_y - 30);
+    }
+}
+
 void GameManager::Frame()
 {
     DeltaTime = DeltaTimer->restart() / 1000.0;
@@ -47,11 +57,17 @@ void GameManager::Frame()
     m_EntityManager.ResetCollisionGrid();
     m_EntityManager.MoveEntities(DeltaTime);
     ++CurrentFrame;
+    if(CurrentFrame % 30 == 0)
+    {
+    PlayerAttack();
+    }
 
-
-    if(CurrentFrame > 60){
+    if(CurrentFrame == 60)
+    {
     m_EntityManager.DeleteDeadEntities();
+
     CurrentFrame = 1;
     ++CurrentSecond;
     }
+
 }
