@@ -1,7 +1,4 @@
 #include "Entity.h"
-Entity::Entity(const Enums::EntityType EntityType, const uint16_t Health, const float x, const float y, const float width, const float height, Enums::Activity EntityActive, const float xvelocity, const float yvelocity, const float speed, const Enums::EntityId entityid, const uint8_t projectilepiercing,const Enums::EntityState entityState) :
-    m_EntityType(EntityType),m_Health(Health),m_x(x),m_y(y),m_Width(width),m_Height(height),m_CollisionBox(x,y,width,height),m_xVelocity(xvelocity),m_EntityActive(EntityActive),m_yVelocity(yvelocity),m_Entityid(entityid),m_ProjPiercing(projectilepiercing),m_EntityState(entityState)
-{}
 
 void Entity::TakeDamage(uint16_t Damage)
 {
@@ -11,6 +8,12 @@ void Entity::TakeDamage(uint16_t Damage)
        m_Health = 0;
        m_EntityActive = Enums::Activity::Inactive;
     }
+}
+
+void Entity::Die()
+{
+    m_Health = 0;
+    m_EntityActive = Enums::Activity::Inactive;
 }
 
 QString Entity::Color() const
@@ -36,6 +39,27 @@ QString Entity::Color() const
         break;
     }
 
+
+}
+
+void Entity::PrintEntityData(const Entity entity)
+{
+
+    qDebug() << " Entity Type : " << entity.m_EntityType <<
+        "\n Entity Id : " << entity.m_Entityid <<
+        "\n Entity Health : "<< entity.m_Health <<
+        "\n Entity Height : " << entity.m_Height <<
+        "\n Entity Width : " << entity.m_Width <<
+        "\n Entity Speed : " << entity.m_Speed <<
+        "\n Entity X Position : " << entity.m_x <<
+        "\n Entity Y Position : " << entity.m_y <<
+        "\n Entity X Velocity : " << entity.m_xVelocity <<
+        "\n Entity Y Velocity : " << entity.m_yVelocity <<
+        "\n Entity ProjectilePiercing : " << entity.m_ProjPiercing <<
+        "\n Last Collided Entity Index :  " << entity.m_LastCollidedIndex <<
+        "\n Entity Unique Index : " << entity.m_UniqueIndex <<
+        "\n Entity Activity : " << entity.m_EntityActive <<
+        "\n Entity State : " << entity.m_EntityState;
 
 }
 
@@ -65,9 +89,13 @@ void Entity::SetValues(const Enums::EntityType EntityType, const uint16_t Health
     m_EntityActive = entityActive;
     m_EntityState = entityState;
 }
-CollisionBox::CollisionBox(const float x, const float y, const float width, const float height) :
-    m_LeftCorner(x),m_RightCorner(x + width),m_TopCorner(y),m_BottomCorner(y + height)
-{}
+
+void Entity::SetValues(Entity Entity)
+{
+Entity.m_UniqueIndex = this->m_UniqueIndex;
+    *this = Entity;
+}
+
 
 CollisionBox::CollisionBox(const Entity &Entity):
 m_LeftCorner(Entity.m_x),m_RightCorner(Entity.m_x+Entity.m_Width),m_TopCorner(Entity.m_y),m_BottomCorner(Entity.m_y + Entity.m_Height)
